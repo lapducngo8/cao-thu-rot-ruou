@@ -1,0 +1,2238 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CAO THỦ RÓT RƯỢU - v4 Deluxe</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #120a06;
+    color: #f5ebd6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    touch-action: none;
+  }
+  #app {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  /* Header & Title Bar */
+  #topbar {
+    background: linear-gradient(180deg, #2b1a0e 0%, #1d1109 100%);
+    border-bottom: 1px solid #573a22;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 10;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.6);
+  }
+  .title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 3px;
+    border-bottom: 1px solid rgba(246, 182, 86, 0.18);
+  }
+  .game-brand {
+    font-size: 15px;
+    font-weight: 800;
+    color: #f6b656;
+    letter-spacing: 0.6px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(246, 182, 86, 0.25);
+  }
+  .row-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .btn-group {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    background: linear-gradient(180deg, #422b19 0%, #2d1c10 100%);
+    color: #e2cfb6;
+    border: 1px solid #6b492c;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    transition: transform 0.1s, background 0.2s;
+  }
+  .btn:active {
+    transform: scale(0.96);
+  }
+  .btn.active {
+    background: linear-gradient(180deg, #e59b3e 0%, #bd711e 100%);
+    color: #140d08;
+    border-color: #ffd285;
+    box-shadow: 0 0 8px rgba(246, 182, 86, 0.4);
+  }
+  .btn-tremor.active {
+    background: linear-gradient(180deg, #d64535 0%, #a3281b 100%);
+    color: #fff;
+    border-color: #ff9487;
+  }
+  .btn-sound.active {
+    background: linear-gradient(180deg, #3b5e2b 0%, #28421c 100%);
+    border-color: #7ab85c;
+    color: #e9f7e1;
+  }
+  .btn-action {
+    background: linear-gradient(180deg, #2e5446 0%, #1f3b31 100%);
+    border-color: #4d8a72;
+    color: #dfece6;
+  }
+  .btn-help {
+    background: linear-gradient(180deg, #523720 0%, #3b2615 100%);
+    border-color: #966a3e;
+    color: #f6b656;
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+  /* Status HUD */
+  #hud {
+    background: rgba(22, 13, 8, 0.94);
+    padding: 4px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    border-bottom: 1px solid #3a2618;
+    z-index: 10;
+  }
+  .hud-item span {
+    color: #f6b656;
+    font-weight: bold;
+  }
+  /* Quick Goal Banner */
+  #goal-banner {
+    background: linear-gradient(90deg, rgba(58, 34, 18, 0.95), rgba(98, 57, 24, 0.95), rgba(58, 34, 18, 0.95));
+    border-bottom: 1px solid #784f2a;
+    color: #ffdfa8;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    padding: 5px 10px;
+    z-index: 10;
+    transition: background 0.3s, transform 0.2s;
+  }
+  #goal-banner.pulse {
+    background: linear-gradient(90deg, #8c4f19, #df8f32, #8c4f19);
+    color: #140d08;
+  }
+  /* Main Canvas Wrapper */
+  #canvas-wrap {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+  /* Quick Pop-up Toast inside Canvas when switching modes */
+  #goal-toast {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(28, 17, 10, 0.92);
+    border: 1.5px solid #f6b656;
+    color: #fff3db;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    max-width: 90%;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.65);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: 15;
+  }
+  #goal-toast.show {
+    opacity: 1;
+  }
+  /* Physics Overlay */
+  #phys-panel {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(15, 10, 6, 0.88);
+    border: 1px solid #634329;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 11px;
+    line-height: 1.4;
+    pointer-events: none;
+    display: none;
+    z-index: 12;
+  }
+  /* Start Screen & End Game Modals */
+  .overlay-modal {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10, 6, 3, 0.88);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    z-index: 30;
+  }
+  #confettiCanvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 31;
+  }
+  .modal-card {
+    position: relative;
+    z-index: 32;
+    background: linear-gradient(180deg, #2b1a0f 0%, #1f120a 100%);
+    border: 2px solid #c87d28;
+    border-radius: 14px;
+    max-width: 440px;
+    width: 100%;
+    padding: 16px;
+    color: #f5ebd6;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.88), 0 0 25px rgba(200, 125, 40, 0.2);
+    max-height: 94vh;
+    overflow-y: auto;
+  }
+  .modal-card.celebrate {
+    border-color: #ffd700;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.9), 0 0 35px rgba(255, 215, 0, 0.45);
+    animation: cardPop 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  }
+  @keyframes cardPop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .start-logo {
+    font-size: 22px;
+    font-weight: 900;
+    color: #f6b656;
+    text-align: center;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+  }
+  .start-sub {
+    text-align: center;
+    font-size: 12px;
+    color: #ccb597;
+    margin-bottom: 12px;
+  }
+  .guide-box {
+    background: rgba(20, 12, 7, 0.85);
+    border: 1px solid #4a321f;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .guide-box b {
+    color: #f6b656;
+  }
+  .guide-box ul {
+    padding-left: 16px;
+    margin-top: 4px;
+  }
+  .guide-box li {
+    margin-bottom: 3px;
+  }
+  .start-mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .start-mode-btn {
+    background: #382415;
+    color: #e2cfb6;
+    border: 1.5px solid #634329;
+    border-radius: 8px;
+    padding: 8px 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+  }
+  .start-mode-btn.active {
+    background: linear-gradient(180deg, #e59b3e 0%, #bd711e 100%);
+    color: #140d08;
+    border-color: #f6b656;
+  }
+  .modal-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #f6b656;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .applause-badge {
+    display: none;
+    text-align: center;
+    background: linear-gradient(90deg, rgba(255,215,0,0.12), rgba(255,215,0,0.32), rgba(255,215,0,0.12));
+    border: 1px solid #ffd700;
+    color: #ffe875;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin: 0 auto 8px auto;
+    width: fit-content;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+  }
+  .score-big {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    color: #5ce68b;
+    margin: 6px 0 12px 0;
+    text-shadow: 0 2px 10px rgba(92, 230, 139, 0.35);
+  }
+  table.score-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+  table.score-table th, table.score-table td {
+    border: 1px solid #4a321f;
+    padding: 6px 8px;
+    text-align: left;
+  }
+  table.score-table th {
+    background: #382415;
+    color: #f6b656;
+  }
+  .glass-summary {
+    font-size: 12px;
+    margin-bottom: 14px;
+    background: #19100a;
+    padding: 8px;
+    border-radius: 6px;
+    line-height: 1.5;
+  }
+  .modal-btn {
+    width: 100%;
+    padding: 11px;
+    background: linear-gradient(180deg, #e59b3e 0%, #bd711e 100%);
+    color: #140d08;
+    font-weight: 800;
+    font-size: 15px;
+    border: 1px solid #ffd285;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Top Bar -->
+  <div id="topbar">
+    <div class="title-row">
+      <div class="game-brand">🍶 CAO THỦ RÓT RƯỢU</div>
+      <div class="btn-group">
+        <button class="btn btn-sound active" id="sound-btn">🔊 Âm thanh: BẬT</button>
+        <button class="btn btn-help" id="open-start-btn">📖 Hướng Dẫn</button>
+      </div>
+    </div>
+    <div class="row-bar">
+      <div class="btn-group" id="mode-group">
+        <button class="btn active" data-mode="standard">🥃 1. Rượu Đế</button>
+        <button class="btn" data-mode="tapered">🍸 2. Ly Loe</button>
+        <button class="btn" data-mode="sparkling">🍷 3. Vang Sủi</button>
+        <button class="btn" data-mode="blind">⚖️ 4. Chia Rượu</button>
+      </div>
+    </div>
+    <div class="row-bar">
+      <div class="btn-group" id="count-group">
+        <button class="btn" data-count="2">2 Ly</button>
+        <button class="btn" data-count="3">3 Ly</button>
+        <button class="btn active" data-count="4">4 Ly</button>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-tremor" id="tremor-btn">〰️ Run Tay: Tắt</button>
+        <button class="btn" id="hand-btn">🖐️ Tay Phải</button>
+        <button class="btn" id="phys-btn">📐 Vật Lý</button>
+        <button class="btn btn-action" id="reset-btn">🔄 Chơi Lại</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status HUD -->
+  <div id="hud">
+    <div class="hud-item" id="hud-left">Ly: <span>1/4</span></div>
+    <div class="hud-item" id="hud-mid">Mục tiêu: <span>45.0 ml</span></div>
+    <div class="hud-item" id="hud-right">Thời gian: <span>0.0s</span></div>
+  </div>
+
+  <!-- Persistent Quick Goal Banner -->
+  <div id="goal-banner">🎯 Mục tiêu: “Đủ ly, không đổ, rót nhanh”</div>
+
+  <!-- Main Canvas Area -->
+  <div id="canvas-wrap">
+    <canvas id="gameCanvas"></canvas>
+    <div id="goal-toast">🎯 Đủ ly, không đổ, rót nhanh</div>
+    <div id="phys-panel"></div>
+
+    <!-- Start Screen Overlay Modal -->
+    <div class="overlay-modal" id="start-modal" style="display: flex;">
+      <div class="modal-card">
+        <div class="start-logo">🍶 CAO THỦ RÓT RƯỢU</div>
+        <div class="start-sub">Mô phỏng vật lý rót rượu & âm thanh sống động</div>
+
+        <div class="guide-box">
+          <b>🖐️ Quy ước điều khiển độ nghiêng:</b>
+          <ul>
+            <li>Chạm ngón tay ở mốc <b>1/4 màn hình</b> (tính từ mép tay thuận): Chai bắt đầu nghiêng và rượu chảy nhẹ.</li>
+            <li>Kéo dần vào <b>giữa màn hình (1/2)</b>: Chai dốc mạnh nhất, rượu chảy nhanh nhất.</li>
+            <li><b>Đổi ly tiếp theo:</b> Nhấc ngón tay khỏi màn hình hoặc kéo lùi về vùng nghỉ (&lt; 1/4).</li>
+          </ul>
+        </div>
+
+        <div class="guide-box">
+          <b>⚗️ Nguyên tắc vật lý & Âm thanh:</b>
+          <ul>
+            <li><b>Lắng nghe tiếng rót:</b> Cao độ tiếng rượu chảy tăng dần khi ly đầy lên!</li>
+            <li><b>Quán tính & Giọt thừa:</b> Rượu vẫn rơi thêm một chút sau khi ngắt tay, hãy ngắt sớm trước vạch!</li>
+            <li><b>Ục khí & Áp suất:</b> Dốc quá gắt lúc chai đầy dễ gây ục khí bắn rượu; khi chai vơi cần nghiêng sâu hơn.</li>
+          </ul>
+        </div>
+
+        <div class="guide-box" id="start-goal-box">
+          <b>🎯 Mục tiêu chế độ đang chọn:</b><br>
+          <span id="start-goal-text" style="color:#5ce68b; font-weight:bold;">“Đủ ly, không đổ, rót nhanh”</span>
+        </div>
+
+        <div class="start-mode-grid" id="start-mode-grid">
+          <button class="start-mode-btn active" data-mode="standard">🥃 1. Rượu Đế</button>
+          <button class="start-mode-btn" data-mode="tapered">🍸 2. Ly Loe</button>
+          <button class="start-mode-btn" data-mode="sparkling">🍷 3. Vang Sủi</button>
+          <button class="start-mode-btn" data-mode="blind">⚖️ 4. Chia Rượu</button>
+        </div>
+
+        <button class="modal-btn" id="start-play-btn">BẮT ĐẦU RÓT RƯỢU</button>
+      </div>
+    </div>
+
+    <!-- End Game Result Modal -->
+    <div class="overlay-modal" id="modal">
+      <canvas id="confettiCanvas"></canvas>
+      <div class="modal-card" id="result-card">
+        <div class="modal-title" id="m-title">KẾT QUẢ BÀN RƯỢU</div>
+        <div class="applause-badge" id="m-applause">👏 TUYỆT ĐỈNH TỬU LƯỢNG! KHÁN GIẢ VỖ TAY! 🎉</div>
+        <div class="score-big" id="m-score">30 / 30 ĐIỂM</div>
+        <div id="m-details"></div>
+        <div class="glass-summary" id="m-glasses"></div>
+        <button class="modal-btn" id="modal-restart">CHƠI VÁN MỚI</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // Polyfill roundRect for older mobile browsers / WebViews
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+      var radius = typeof r === 'number' ? r : (Array.isArray(r) ? r[0] : 0);
+      if (w < 2 * radius) radius = w / 2;
+      if (h < 2 * radius) radius = h / 2;
+      this.beginPath();
+      this.moveTo(x + radius, y);
+      this.arcTo(x + w, y, x + w, y + h, radius);
+      this.arcTo(x + w, y + h, x, y + h, radius);
+      this.arcTo(x, y + h, x, y, radius);
+      this.arcTo(x, y, x + w, y, radius);
+      this.closePath();
+      return this;
+    };
+  }
+
+  var canvas = document.getElementById('gameCanvas');
+  var ctx = canvas.getContext('2d');
+  var wrap = document.getElementById('canvas-wrap');
+  var confettiCanvas = document.getElementById('confettiCanvas');
+  var cCtx = confettiCanvas.getContext('2d');
+  var toastTimeout = null;
+
+  // =========================================================================
+  // WEB AUDIO API SOUND ENGINE (100% Synthesized, Self-Contained)
+  // =========================================================================
+  var sfx = {
+    enabled: true,
+    ctx: null,
+    noiseBuffer: null,
+    pourSource: null,
+    pourFilter: null,
+    pourResFilter: null,
+    pourGain: null,
+    lastDropTime: 0,
+    lastGlugCycle: -1,
+
+    init: function() {
+      if (this.ctx) {
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+        return;
+      }
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      this.ctx = new AudioCtx();
+
+      // Create 2-second pink/white noise buffer for liquid stream & applause
+      var sr = this.ctx.sampleRate;
+      var bufferSize = sr * 2;
+      this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, sr);
+      var out = this.noiseBuffer.getChannelData(0);
+      var b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (var i = 0; i < bufferSize; i++) {
+        var white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        out[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.04;
+        b6 = white * 0.115926;
+      }
+
+      // Setup continuous pouring stream loop
+      this.pourSource = this.ctx.createBufferSource();
+      this.pourSource.buffer = this.noiseBuffer;
+      this.pourSource.loop = true;
+
+      this.pourFilter = this.ctx.createBiquadFilter();
+      this.pourFilter.type = 'bandpass';
+      this.pourFilter.frequency.value = 500;
+      this.pourFilter.Q.value = 2.8;
+
+      this.pourResFilter = this.ctx.createBiquadFilter();
+      this.pourResFilter.type = 'peaking';
+      this.pourResFilter.frequency.value = 700;
+      this.pourResFilter.Q.value = 5.0;
+      this.pourResFilter.gain.value = 10;
+
+      this.pourGain = this.ctx.createGain();
+      this.pourGain.gain.value = 0.0001;
+
+      this.pourSource.connect(this.pourFilter);
+      this.pourFilter.connect(this.pourResFilter);
+      this.pourResFilter.connect(this.pourGain);
+      this.pourGain.connect(this.ctx.destination);
+      this.pourSource.start(0);
+    },
+
+    updatePour: function(flowRate, fillRatio, isSparkling, glugIntensity, glugPhase) {
+      if (!this.ctx || !this.enabled) {
+        if (this.pourGain && this.ctx) {
+          this.pourGain.gain.setTargetAtTime(0.0001, this.ctx.currentTime, 0.03);
+        }
+        return;
+      }
+
+      var now = this.ctx.currentTime;
+      var clampedFill = Math.max(0, Math.min(1.1, fillRatio));
+
+      if (flowRate > 0.12) {
+        // Volume proportional to flow rate
+        var normFlow = Math.min(1, flowRate / 24.0);
+        var targetGain = (0.04 + 0.24 * Math.pow(normFlow, 0.75)) * (isSparkling ? 1.2 : 1.0);
+        this.pourGain.gain.setTargetAtTime(targetGain, now, 0.025);
+
+        // Pitch rises as the glass fills up (hollow resonance shifting upward)
+        var baseFreq = isSparkling ? 580 : 380;
+        var topFreq = isSparkling ? 1400 : 1080;
+        var targetFreq = baseFreq + clampedFill * (topFreq - baseFreq);
+        this.pourFilter.frequency.setTargetAtTime(targetFreq, now, 0.04);
+        this.pourResFilter.frequency.setTargetAtTime(targetFreq * 1.35, now, 0.04);
+
+        // Trigger rapid water-drop / bubble plops whose pitch tracks glass fullness
+        var dropInterval = Math.max(0.028, 0.095 - normFlow * 0.06);
+        if (now - this.lastDropTime > dropInterval) {
+          this.lastDropTime = now;
+          this.playBubbleDrop(clampedFill, normFlow, isSparkling);
+        }
+
+        // Trigger bottle glug sound if glugging
+        if (glugIntensity > 0.12) {
+          var cycle = Math.floor(glugPhase / (Math.PI * 2));
+          if (cycle !== this.lastGlugCycle) {
+            this.lastGlugCycle = cycle;
+            this.playGlug(glugIntensity);
+          }
+        }
+      } else {
+        this.pourGain.gain.setTargetAtTime(0.0001, now, 0.03);
+      }
+    },
+
+    playBubbleDrop: function(fillRatio, normFlow, isSparkling) {
+      if (!this.ctx || !this.enabled) return;
+      var now = this.ctx.currentTime;
+      var osc = this.ctx.createOscillator();
+      var g = this.ctx.createGain();
+
+      // Frequency rises with glass fill level
+      var startF = (290 + fillRatio * 560) * (0.92 + Math.random() * 0.18);
+      var endF = startF * (isSparkling ? 1.65 : 1.42);
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(startF, now);
+      osc.frequency.exponentialRampToValueAtTime(endF, now + 0.045);
+
+      var amp = (0.018 + 0.045 * normFlow) * (isSparkling ? 0.8 : 1.0);
+      g.gain.setValueAtTime(amp, now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+
+      osc.connect(g);
+      g.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.055);
+    },
+
+    playGlug: function(intensity) {
+      if (!this.ctx || !this.enabled) return;
+      var now = this.ctx.currentTime;
+      var osc = this.ctx.createOscillator();
+      var g = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(115, now);
+      osc.frequency.exponentialRampToValueAtTime(210, now + 0.075);
+
+      var amp = Math.min(0.18, 0.06 + intensity * 0.12);
+      g.gain.setValueAtTime(amp, now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.085);
+
+      osc.connect(g);
+      g.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.09);
+    },
+
+    playGlassClink: function() {
+      if (!this.ctx || !this.enabled) return;
+      var now = this.ctx.currentTime;
+      var freqs = [2180, 3420];
+      for (var i = 0; i < freqs.length; i++) {
+        var osc = this.ctx.createOscillator();
+        var g = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freqs[i], now);
+        g.gain.setValueAtTime(i === 0 ? 0.05 : 0.025, now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+        osc.connect(g);
+        g.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.19);
+      }
+    },
+
+    playApplauseAndFanfare: function() {
+      if (!this.ctx || !this.enabled) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      var now = this.ctx.currentTime;
+
+      // 1. Celebratory Fanfare Chords (Bright Brass/Chime arpeggio)
+      var notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+      for (var n = 0; n < notes.length; n++) {
+        var osc = this.ctx.createOscillator();
+        var g = this.ctx.createGain();
+        osc.type = n % 2 === 0 ? 'triangle' : 'sine';
+        var startT = now + n * 0.075;
+        osc.frequency.setValueAtTime(notes[n], startT);
+        g.gain.setValueAtTime(0.0001, startT);
+        g.gain.linearRampToValueAtTime(0.08, startT + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, startT + 0.65);
+        osc.connect(g);
+        g.connect(this.ctx.destination);
+        osc.start(startT);
+        osc.stop(startT + 0.68);
+      }
+
+      // 2. Multi-layered Crowd Applause (85 distinct claps over 3.2 seconds)
+      var totalClaps = 85;
+      for (var i = 0; i < totalClaps; i++) {
+        var progress = i / totalClaps;
+        // Envelope of the crowd applause: quick buildup, sustained middle, gentle fade
+        var crowdEnv = Math.sin(Math.pow(progress, 0.7) * Math.PI);
+        var delay = progress * 3.1 + (Math.random() * 0.06);
+        this.triggerSingleClap(now + delay, 0.05 + 0.11 * crowdEnv);
+      }
+    },
+
+    triggerSingleClap: function(startTime, volume) {
+      if (!this.ctx || !this.noiseBuffer) return;
+      var src = this.ctx.createBufferSource();
+      src.buffer = this.noiseBuffer;
+
+      var filter = this.ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 950 + Math.random() * 1450;
+      filter.Q.value = 1.6 + Math.random() * 1.8;
+
+      var g = this.ctx.createGain();
+      var dur = 0.038 + Math.random() * 0.032;
+      g.gain.setValueAtTime(0.0001, startTime);
+      g.gain.linearRampToValueAtTime(volume, startTime + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, startTime + dur);
+
+      src.connect(filter);
+      filter.connect(g);
+      g.connect(this.ctx.destination);
+
+      var offset = Math.random() * 1.5;
+      src.start(startTime, offset, dur + 0.01);
+    }
+  };
+
+  // =========================================================================
+  // GAME STATE & VISUAL FX PARTICLES
+  // =========================================================================
+  var state = {
+    mode: 'standard',     // 'standard', 'tapered', 'sparkling', 'blind'
+    numGlasses: 4,
+    rightHanded: true,
+    showPhysics: false,
+    handTremor: false,
+
+    // Gameplay runtime
+    currentGlass: 0,
+    glasses: [],
+    bottleMaxVol: 300,
+    bottleVol: 240,
+    initialBottleVol: 240,
+
+    // Pouring Physics
+    isTouching: false,
+    fingerX: 0,
+    fingerY: 0,
+    basePourRatio: 0,
+    pourRatio: 0,
+    prevPourRatio: 0,
+    tiltAngle: 0,
+    tremorPhase: 0,
+    tremorOffsetX: 0,
+    Q_target: 0,
+    Q_actual: 0,
+    inFlightVol: 0,
+    glugPhase: 0,
+    glugIntensity: 0,
+    hasPouredCurrent: false,
+
+    // Visual Animation & Particles
+    wavePhase: 0,
+    splashes: [],
+    neckBubbles: [],
+    confetti: [],
+    bokehLights: [],
+
+    // Transition & Timing
+    switchingGlass: false,
+    switchTimer: 0,
+    trayOffsetX: 0,
+    elapsedTime: 0,
+    timerRunning: false,
+    totalSpilled: 0,
+    gameEnded: false,
+    floatingText: null,
+    bubbles: []
+  };
+
+  // Generate warm background bokeh lights once
+  for (var bIdx = 0; bIdx < 18; bIdx++) {
+    state.bokehLights.push({
+      xFrac: Math.random(),
+      yFrac: 0.08 + Math.random() * 0.55,
+      r: 8 + Math.random() * 24,
+      alpha: 0.04 + Math.random() * 0.1,
+      phase: Math.random() * Math.PI * 2,
+      color: bIdx % 3 === 0 ? '255, 190, 95' : (bIdx % 3 === 1 ? '255, 140, 65' : '255, 225, 150')
+    });
+  }
+
+  function getGoalMessage(mode) {
+    if (mode === 'blind') {
+      return '“Tuần rượu cuối, nhớ chia cho đều và đừng làm đổ nhé bạn”';
+    }
+    return '“Đủ ly, không đổ, rót nhanh”';
+  }
+
+  function showGoalAnnouncement() {
+    var msg = getGoalMessage(state.mode);
+    var banner = document.getElementById('goal-banner');
+    var toast = document.getElementById('goal-toast');
+    var startGoalText = document.getElementById('start-goal-text');
+
+    banner.textContent = '🎯 Mục tiêu: ' + msg;
+    banner.classList.add('pulse');
+    setTimeout(function() {
+      banner.classList.remove('pulse');
+    }, 600);
+
+    if (startGoalText) {
+      startGoalText.textContent = msg;
+    }
+
+    if (toast) {
+      toast.textContent = '🎯 ' + msg;
+      toast.classList.add('show');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(function() {
+        toast.classList.remove('show');
+      }, 2800);
+    }
+  }
+
+  function syncModeButtons() {
+    var topBtns = document.querySelectorAll('#mode-group .btn');
+    for (var i = 0; i < topBtns.length; i++) {
+      topBtns[i].classList.toggle('active', topBtns[i].getAttribute('data-mode') === state.mode);
+    }
+    var startBtns = document.querySelectorAll('#start-mode-grid .start-mode-btn');
+    for (var j = 0; j < startBtns.length; j++) {
+      startBtns[j].classList.toggle('active', startBtns[j].getAttribute('data-mode') === state.mode);
+    }
+  }
+
+  function createGlasses() {
+    var arr = [];
+    for (var i = 0; i < state.numGlasses; i++) {
+      arr.push({
+        liquid: 0,
+        foam: 0,
+        spilled: 0,
+        target: 45,
+        maxCap: 55,
+        ripple: 0
+      });
+    }
+    return arr;
+  }
+
+  function initGame() {
+    state.currentGlass = 0;
+    state.glasses = createGlasses();
+    state.bottleMaxVol = 300;
+
+    if (state.mode === 'blind') {
+      var perGlass = 36.7 + Math.random() * 4.5;
+      state.initialBottleVol = Math.round(perGlass * state.numGlasses * 10) / 10;
+      state.bottleVol = state.initialBottleVol;
+    } else {
+      state.initialBottleVol = state.numGlasses === 4 ? 230 : (state.numGlasses === 3 ? 185 : 140);
+      state.bottleVol = state.initialBottleVol;
+    }
+
+    state.isTouching = false;
+    state.basePourRatio = 0;
+    state.pourRatio = 0;
+    state.prevPourRatio = 0;
+    state.tiltAngle = 0;
+    state.tremorPhase = 0;
+    state.tremorOffsetX = 0;
+    state.Q_target = 0;
+    state.Q_actual = 0;
+    state.inFlightVol = 0;
+    state.glugPhase = 0;
+    state.glugIntensity = 0;
+    state.hasPouredCurrent = false;
+    state.switchingGlass = false;
+    state.switchTimer = 0;
+    state.trayOffsetX = 0;
+    state.elapsedTime = 0;
+    state.timerRunning = false;
+    state.totalSpilled = 0;
+    state.gameEnded = false;
+    state.floatingText = null;
+    state.bubbles = [];
+    state.splashes = [];
+    state.neckBubbles = [];
+    state.confetti = [];
+
+    sfx.updatePour(0, 0, false, 0, 0);
+
+    document.getElementById('modal').style.display = 'none';
+    syncModeButtons();
+    showGoalAnnouncement();
+    updateHUD();
+  }
+
+  function resizeCanvas() {
+    var rect = wrap.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(300, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(260, Math.floor(rect.height * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    confettiCanvas.width = canvas.width;
+    confettiCanvas.height = canvas.height;
+    cCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resizeCanvas);
+  setTimeout(resizeCanvas, 50);
+
+  function computePourRatio(clientX) {
+    var rect = canvas.getBoundingClientRect();
+    var x = clientX - rect.left;
+    var w = rect.width;
+    var ratio = 0;
+    if (state.rightHanded) {
+      var startX = 0.75 * w;
+      var maxX = 0.50 * w;
+      if (x >= startX) {
+        ratio = 0;
+      } else if (x <= maxX) {
+        ratio = 1;
+      } else {
+        ratio = (startX - x) / (startX - maxX);
+      }
+    } else {
+      var startXLeft = 0.25 * w;
+      var maxXLeft = 0.50 * w;
+      if (x <= startXLeft) {
+        ratio = 0;
+      } else if (x >= maxXLeft) {
+        ratio = 1;
+      } else {
+        ratio = (x - startXLeft) / (maxXLeft - startXLeft);
+      }
+    }
+    return Math.max(0, Math.min(1, ratio));
+  }
+
+  function triggerNextGlass() {
+    if (state.switchingGlass || state.gameEnded) return;
+    state.switchingGlass = true;
+    state.switchTimer = 0.22;
+    state.basePourRatio = 0;
+    state.pourRatio = 0;
+    state.isTouching = false;
+    sfx.playGlassClink();
+
+    var g = state.glasses[state.currentGlass];
+    if (state.mode !== 'blind' && g) {
+      var diff = Math.abs(g.liquid - g.target);
+      var msg = diff <= 1.5 ? 'CHUẨN XÁC!' : (diff <= 3.6 ? 'ĐẠT CHUẨN!' : (g.liquid > g.maxCap ? 'TRÀN LY!' : 'LỆCH VẠCH!'));
+      var col = diff <= 3.6 ? '#5ce68b' : '#ff6b6b';
+      state.floatingText = { text: msg, color: col, timer: 0.9 };
+    } else if (state.mode === 'blind') {
+      state.floatingText = { text: 'ĐÃ XONG LY ' + (state.currentGlass + 1), color: '#f6b656', timer: 0.8 };
+    }
+  }
+
+  // Input Handling (Touch + Mouse)
+  function onPointerDown(clientX, clientY) {
+    sfx.init();
+    if (state.gameEnded || state.switchingGlass) return;
+    if (document.getElementById('start-modal').style.display === 'flex') return;
+    state.isTouching = true;
+    state.fingerX = clientX;
+    state.fingerY = clientY;
+    state.basePourRatio = computePourRatio(clientX);
+    state.pourRatio = state.basePourRatio;
+    if (state.basePourRatio > 0 && !state.timerRunning) {
+      state.timerRunning = true;
+    }
+  }
+
+  function onPointerMove(clientX, clientY) {
+    if (!state.isTouching || state.gameEnded || state.switchingGlass) return;
+    state.fingerX = clientX;
+    state.fingerY = clientY;
+    var newRatio = computePourRatio(clientX);
+    if (newRatio > 0 && !state.timerRunning) {
+      state.timerRunning = true;
+    }
+    if (state.hasPouredCurrent && newRatio === 0 && state.glasses[state.currentGlass].liquid > 2) {
+      triggerNextGlass();
+      return;
+    }
+    state.basePourRatio = newRatio;
+  }
+
+  function onPointerUp() {
+    if (!state.isTouching || state.gameEnded) return;
+    state.isTouching = false;
+    state.basePourRatio = 0;
+    state.pourRatio = 0;
+    if (state.hasPouredCurrent && !state.switchingGlass && state.glasses[state.currentGlass].liquid > 2) {
+      triggerNextGlass();
+    }
+  }
+
+  canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (e.touches.length > 0) {
+      onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    if (e.touches.length > 0) {
+      onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    onPointerUp();
+  }, { passive: false });
+
+  canvas.addEventListener('mousedown', function(e) {
+    onPointerDown(e.clientX, e.clientY);
+  });
+  window.addEventListener('mousemove', function(e) {
+    onPointerMove(e.clientX, e.clientY);
+  });
+  window.addEventListener('mouseup', function() {
+    onPointerUp();
+  });
+
+  // Top Bar Mode Buttons
+  var modeBtns = document.querySelectorAll('#mode-group .btn');
+  for (var i = 0; i < modeBtns.length; i++) {
+    modeBtns[i].addEventListener('click', function() {
+      sfx.init();
+      state.mode = this.getAttribute('data-mode');
+      initGame();
+    });
+  }
+
+  // Start Screen Mode Buttons
+  var startModeBtns = document.querySelectorAll('#start-mode-grid .start-mode-btn');
+  for (var sm = 0; sm < startModeBtns.length; sm++) {
+    startModeBtns[sm].addEventListener('click', function() {
+      sfx.init();
+      state.mode = this.getAttribute('data-mode');
+      initGame();
+    });
+  }
+
+  // Sound Toggle Button
+  document.getElementById('sound-btn').addEventListener('click', function() {
+    sfx.init();
+    sfx.enabled = !sfx.enabled;
+    this.classList.toggle('active', sfx.enabled);
+    this.textContent = sfx.enabled ? '🔊 Âm thanh: BẬT' : '🔇 Âm thanh: Tắt';
+    if (!sfx.enabled) {
+      sfx.updatePour(0, 0, false, 0, 0);
+    }
+  });
+
+  // Open / Close Start Screen
+  document.getElementById('open-start-btn').addEventListener('click', function() {
+    sfx.updatePour(0, 0, false, 0, 0);
+    document.getElementById('start-modal').style.display = 'flex';
+  });
+  document.getElementById('start-play-btn').addEventListener('click', function() {
+    sfx.init();
+    document.getElementById('start-modal').style.display = 'none';
+    initGame();
+  });
+
+  var countBtns = document.querySelectorAll('#count-group .btn');
+  for (var k = 0; k < countBtns.length; k++) {
+    countBtns[k].addEventListener('click', function() {
+      sfx.init();
+      for (var j = 0; j < countBtns.length; j++) countBtns[j].classList.remove('active');
+      this.classList.add('active');
+      state.numGlasses = parseInt(this.getAttribute('data-count'), 10);
+      initGame();
+    });
+  }
+
+  document.getElementById('tremor-btn').addEventListener('click', function() {
+    sfx.init();
+    state.handTremor = !state.handTremor;
+    this.classList.toggle('active', state.handTremor);
+    this.textContent = state.handTremor ? '〰️ Run Tay: BẬT' : '〰️ Run Tay: Tắt';
+    initGame();
+  });
+
+  document.getElementById('hand-btn').addEventListener('click', function() {
+    sfx.init();
+    state.rightHanded = !state.rightHanded;
+    this.textContent = state.rightHanded ? '🖐️ Tay Phải' : '🖐️ Tay Trái';
+    initGame();
+  });
+
+  document.getElementById('phys-btn').addEventListener('click', function() {
+    state.showPhysics = !state.showPhysics;
+    this.classList.toggle('active', state.showPhysics);
+    document.getElementById('phys-panel').style.display = state.showPhysics ? 'block' : 'none';
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', function() {
+    sfx.init();
+    initGame();
+  });
+  document.getElementById('modal-restart').addEventListener('click', function() {
+    sfx.init();
+    initGame();
+  });
+
+  function updateHUD() {
+    var gIdx = Math.min(state.currentGlass + 1, state.numGlasses);
+    document.getElementById('hud-left').innerHTML = 'Ly: <span>' + gIdx + '/' + state.numGlasses + '</span>';
+    if (state.mode === 'blind') {
+      document.getElementById('hud-mid').innerHTML = 'Chia đều: <span>Lệch ≤ 3ml</span>';
+      document.getElementById('hud-right').innerHTML = 'Rượu đổ: <span>' + state.totalSpilled.toFixed(1) + ' ml</span>';
+    } else {
+      var targetSec = state.mode === 'sparkling' ? 5 : 4;
+      document.getElementById('hud-mid').innerHTML = 'Chuẩn: <span>45.0 ml (≤' + targetSec + 's/ly=10đ)</span>';
+      document.getElementById('hud-right').innerHTML = 'Thời gian: <span>' + state.elapsedTime.toFixed(1) + 's</span>';
+    }
+  }
+
+  // Spawn Confetti when Score >= 25
+  function spawnConfetti() {
+    var rect = wrap.getBoundingClientRect();
+    state.confetti = [];
+    var colors = ['#ffd700', '#ff6b6b', '#5ce68b', '#4ecdc4', '#ffbe5f', '#f38181'];
+    for (var i = 0; i < 85; i++) {
+      state.confetti.push({
+        x: Math.random() * rect.width,
+        y: -20 - Math.random() * rect.height * 0.5,
+        vx: (Math.random() - 0.5) * 90,
+        vy: 85 + Math.random() * 140,
+        size: 5 + Math.random() * 6,
+        rot: Math.random() * Math.PI * 2,
+        vRot: (Math.random() - 0.5) * 8,
+        color: colors[i % colors.length]
+      });
+    }
+  }
+
+  function updateAndDrawConfetti(dt) {
+    if (state.confetti.length === 0) return;
+    var rect = wrap.getBoundingClientRect();
+    cCtx.clearRect(0, 0, rect.width, rect.height);
+    for (var i = state.confetti.length - 1; i >= 0; i--) {
+      var p = state.confetti[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.rot += p.vRot * dt;
+      p.vx += Math.sin(p.y * 0.03) * 15 * dt;
+
+      cCtx.save();
+      cCtx.translate(p.x, p.y);
+      cCtx.rotate(p.rot);
+      cCtx.fillStyle = p.color;
+      cCtx.fillRect(-p.size / 2, -p.size / 3, p.size, p.size * 0.66);
+      cCtx.restore();
+
+      if (p.y > rect.height + 30) {
+        state.confetti.splice(i, 1);
+      }
+    }
+  }
+
+  // Physics Step
+  function updatePhysics(dt) {
+    state.wavePhase += dt * 7.5;
+
+    if (state.gameEnded) {
+      sfx.updatePour(0, 0, false, 0, 0);
+      updateAndDrawConfetti(dt);
+      return;
+    }
+
+    if (state.timerRunning && state.mode !== 'blind') {
+      state.elapsedTime += dt;
+    }
+
+    if (state.floatingText) {
+      state.floatingText.timer -= dt;
+      if (state.floatingText.timer <= 0) state.floatingText = null;
+    }
+
+    // 0. Hand Tremor Effect ("Run tay")
+    if (state.handTremor && state.isTouching && state.basePourRatio > 0) {
+      state.tremorPhase += dt * 11.5;
+      var angleJitter = 0.085 * Math.sin(state.tremorPhase) +
+                        0.055 * Math.sin(state.tremorPhase * 2.3 + 1.2) +
+                        0.035 * Math.cos(state.tremorPhase * 4.1);
+      state.pourRatio = Math.max(0.02, Math.min(1.0, state.basePourRatio + angleJitter));
+
+      state.tremorOffsetX = 11.0 * Math.sin(state.tremorPhase * 0.85) +
+                            6.5 * Math.cos(state.tremorPhase * 1.9);
+    } else {
+      state.pourRatio = state.basePourRatio;
+      state.tremorOffsetX *= Math.max(0, 1 - dt * 10);
+    }
+
+    // 1. Remaining bottle volume effect (Head Pressure factor)
+    var fillFrac = Math.max(0, state.bottleVol / state.bottleMaxVol);
+    var minPourThreshold = (1 - fillFrac) * 0.18;
+    var effectiveRatio = 0;
+    if (state.pourRatio > minPourThreshold && state.bottleVol > 0.05) {
+      effectiveRatio = (state.pourRatio - minPourThreshold) / (1 - minPourThreshold);
+    }
+
+    // 2. Glugging (Ục khí cổ chai) when tilting too fast while bottle > 42% full
+    var tiltSpeed = (state.pourRatio - state.prevPourRatio) / Math.max(dt, 0.008);
+    state.prevPourRatio = state.pourRatio;
+    if (tiltSpeed > 2.2 && fillFrac > 0.42 && state.pourRatio > 0.65) {
+      state.glugIntensity = Math.min(1.0, state.glugIntensity + 0.65);
+    }
+    state.glugIntensity = Math.max(0, state.glugIntensity - dt * 1.4);
+    var glugMod = 1.0;
+    if (state.glugIntensity > 0.05) {
+      state.glugPhase += dt * 28;
+      glugMod = 1.0 + 0.45 * Math.sin(state.glugPhase) * state.glugIntensity;
+      if (Math.sin(state.glugPhase) > 0.85) {
+        var splash = 0.6 * state.glugIntensity * dt;
+        state.totalSpilled += splash;
+      }
+      // Spawn visual air bubbles rising inside bottle neck when glugging
+      if (Math.random() < 0.45) {
+        state.neckBubbles.push({
+          y: 4,
+          x: (Math.random() - 0.5) * 10,
+          r: 2 + Math.random() * 2.5,
+          alpha: 0.9
+        });
+      }
+    }
+
+    // Update bottle neck air bubbles
+    for (var nb = state.neckBubbles.length - 1; nb >= 0; nb--) {
+      state.neckBubbles[nb].y += 65 * dt;
+      state.neckBubbles[nb].alpha -= 1.1 * dt;
+      if (state.neckBubbles[nb].alpha <= 0) state.neckBubbles.splice(nb, 1);
+    }
+
+    // 3. Flow Inertia (Quán tính dòng chảy)
+    var maxFlowRate = 24.0;
+    var headFactor = 0.65 + 0.35 * Math.sqrt(fillFrac);
+    state.Q_target = maxFlowRate * Math.pow(effectiveRatio, 1.25) * headFactor * glugMod;
+
+    var tau = state.Q_target > state.Q_actual ? 0.12 : 0.10;
+    state.Q_actual += (state.Q_target - state.Q_actual) * Math.min(1, dt / tau);
+    if (state.Q_actual < 0.05 || state.bottleVol <= 0.01) {
+      state.Q_actual = 0;
+    }
+
+    // Smooth visual tilt angle of bottle
+    var targetAngle = state.pourRatio * 1.65;
+    state.tiltAngle += (targetAngle - state.tiltAngle) * Math.min(1, dt * 14);
+
+    // Outflow from bottle into in-flight stream
+    var outVol = Math.min(state.bottleVol, state.Q_actual * dt);
+    state.bottleVol -= outVol;
+    state.inFlightVol += outVol;
+
+    // Stream landing into glass
+    var landVol = state.inFlightVol * Math.min(1, dt * 11);
+    if (state.inFlightVol < 0.02 && state.Q_actual === 0) {
+      landVol = state.inFlightVol;
+    }
+    state.inFlightVol -= landVol;
+
+    var curG = state.glasses[state.currentGlass];
+
+    // Update Real-time Pouring Sound
+    var currentFillRatio = curG ? ((curG.liquid + curG.foam * 0.4) / curG.maxCap) : 0;
+    sfx.updatePour(state.Q_actual, currentFillRatio, state.mode === 'sparkling', state.glugIntensity, state.glugPhase);
+
+    if (landVol > 0) {
+      state.hasPouredCurrent = true;
+      if (state.switchingGlass && state.switchTimer < 0.12) {
+        state.totalSpilled += landVol;
+      } else if (curG) {
+        curG.ripple = Math.min(1.0, curG.ripple + (state.Q_actual / 24) * 0.35);
+
+        var tremorSpill = 0;
+        if (state.handTremor && Math.abs(state.tremorOffsetX) > 13.5 && state.pourRatio > 0.78) {
+          tremorSpill = landVol * 0.18;
+          state.totalSpilled += tremorSpill;
+          curG.spilled += tremorSpill;
+        }
+        var netLand = landVol - tremorSpill;
+        curG.liquid += netLand;
+
+        // Sparkling wine foam generation
+        if (state.mode === 'sparkling') {
+          var foamRate = 0.25 + 0.95 * (state.Q_actual / maxFlowRate);
+          curG.foam += netLand * foamRate;
+          if (Math.random() < 0.55) {
+            state.bubbles.push({
+              rx: (Math.random() - 0.5) * 0.8,
+              yFrac: Math.random() * 0.6,
+              speed: 0.4 + Math.random() * 0.5
+            });
+          }
+        }
+        // Check overflow (Liquid + Foam > maxCap)
+        var totalHeightVol = curG.liquid + curG.foam;
+        if (totalHeightVol > curG.maxCap) {
+          var excess = totalHeightVol - curG.maxCap;
+          if (curG.foam >= excess) {
+            curG.foam -= excess;
+          } else {
+            var liqExcess = excess - curG.foam;
+            curG.foam = 0;
+            curG.liquid = Math.max(0, curG.liquid - liqExcess);
+          }
+          curG.spilled += excess;
+          state.totalSpilled += excess;
+        }
+      }
+    }
+
+    // Decay surface ripple on glasses
+    for (var rIdx = 0; rIdx < state.glasses.length; rIdx++) {
+      state.glasses[rIdx].ripple *= Math.max(0, 1 - dt * 5);
+    }
+
+    // Update splash droplets
+    for (var sp = state.splashes.length - 1; sp >= 0; sp--) {
+      var pt = state.splashes[sp];
+      pt.x += pt.vx * dt;
+      pt.y += pt.vy * dt;
+      pt.vy += 260 * dt;
+      pt.life -= dt;
+      if (pt.life <= 0) state.splashes.splice(sp, 1);
+    }
+
+    // Foam decay for all glasses in sparkling mode
+    if (state.mode === 'sparkling') {
+      for (var i = 0; i < state.glasses.length; i++) {
+        if (state.glasses[i].foam > 0) {
+          var decay = (3.2 + state.glasses[i].foam * 0.18) * dt;
+          state.glasses[i].foam = Math.max(0, state.glasses[i].foam - decay);
+        }
+      }
+      for (var b = state.bubbles.length - 1; b >= 0; b--) {
+        state.bubbles[b].yFrac += state.bubbles[b].speed * dt;
+        if (state.bubbles[b].yFrac > 1) state.bubbles.splice(b, 1);
+      }
+    }
+
+    // If bottle runs completely empty, finish round after stream lands
+    if (state.bottleVol <= 0.01 && state.inFlightVol <= 0.02 && state.hasPouredCurrent && !state.switchingGlass) {
+      finishGame();
+      return;
+    }
+
+    // Glass switching animation
+    if (state.switchingGlass) {
+      state.switchTimer -= dt;
+      state.trayOffsetX = (1 - state.switchTimer / 0.22);
+      if (state.switchTimer <= 0) {
+        state.switchingGlass = false;
+        state.trayOffsetX = 0;
+        state.hasPouredCurrent = false;
+        state.currentGlass++;
+        if (state.currentGlass >= state.numGlasses) {
+          finishGame();
+          return;
+        }
+      }
+    }
+
+    updateHUD();
+    if (state.showPhysics) {
+      var panel = document.getElementById('phys-panel');
+      var curLiq = curG ? curG.liquid.toFixed(1) : '0.0';
+      panel.innerHTML =
+        '<b>THÔNG SỐ VẬT LÝ REALTIME</b><br>' +
+        'Độ nghiêng (1/4➔1/2): ' + Math.round(state.pourRatio * 100) + '%<br>' +
+        'Độ lệch Run tay: ' + state.tremorOffsetX.toFixed(1) + ' px<br>' +
+        'Lưu lượng Q_target: ' + state.Q_target.toFixed(1) + ' ml/s<br>' +
+        'Lưu lượng Q_actual: ' + state.Q_actual.toFixed(1) + ' ml/s<br>' +
+        'Giọt đang rơi: ' + state.inFlightVol.toFixed(2) + ' ml<br>' +
+        'Ục khí (Glug): ' + Math.round(state.glugIntensity * 100) + '%<br>' +
+        'Rượu trong chai: ' + state.bottleVol.toFixed(1) + ' ml<br>' +
+        'Mực ly hiện tại: ' + curLiq + ' ml';
+    }
+  }
+
+  // Scoring Logic & High-Score Applause Trigger (>= 25/30)
+  function finishGame() {
+    state.gameEnded = true;
+    state.timerRunning = false;
+    state.isTouching = false;
+    sfx.updatePour(0, 0, false, 0, 0);
+
+    var modal = document.getElementById('modal');
+    var resultCard = document.getElementById('result-card');
+    var applauseBadge = document.getElementById('m-applause');
+    var titleEl = document.getElementById('m-title');
+    var scoreEl = document.getElementById('m-score');
+    var detailsEl = document.getElementById('m-details');
+    var glassesEl = document.getElementById('m-glasses');
+
+    var finalScore = 0;
+
+    if (state.mode === 'blind') {
+      // Game 4: Chia Rượu ("Tuần rượu cuối")
+      var vols = [];
+      for (var i = 0; i < state.glasses.length; i++) {
+        vols.push(state.glasses[i].liquid);
+      }
+      var maxV = Math.max.apply(null, vols);
+      var minV = Math.min.apply(null, vols);
+      var diff = maxV - minV;
+      var leftover = state.bottleVol;
+      var totalWaste = state.totalSpilled + leftover;
+
+      var diffScore = 0;
+      if (diff <= 3.0) diffScore = 15;
+      else if (diff <= 5.0) diffScore = 12;
+      else if (diff <= 8.0) diffScore = 8;
+      else diffScore = 4;
+
+      var spillScore = 0;
+      if (totalWaste <= 1.0) spillScore = 15;
+      else if (totalWaste <= 3.0) spillScore = 12;
+      else if (totalWaste <= 6.0) spillScore = 8;
+      else spillScore = 4;
+
+      var totalBlindScore = diffScore + spillScore;
+      finalScore = totalBlindScore;
+      var passed = (diff <= 3.0 && state.totalSpilled <= 0.5);
+
+      titleEl.textContent = passed ? '🏆 CAO THỦ CHIA RƯỢU!' : '⚖️ KẾT QUẢ CHIA RƯỢU';
+      scoreEl.textContent = totalBlindScore + ' / 30 ĐIỂM';
+      detailsEl.innerHTML =
+        '<table class="score-table">' +
+        '<tr><th>Tiêu chí (Chia Rượu)</th><th>Kết quả</th><th>Điểm</th></tr>' +
+        '<tr><td>Độ lệch Max - Min (≤ 3ml)</td><td>' + diff.toFixed(1) + ' ml</td><td><b>' + diffScore + '/15</b></td></tr>' +
+        '<tr><td>Rượu tràn + Còn dư chai</td><td>' + totalWaste.toFixed(1) + ' ml</td><td><b>' + spillScore + '/15</b></td></tr>' +
+        '</table>';
+
+      var gHtml = '<b>Chi tiết từng ly (Tổng chai ban đầu: ' + state.initialBottleVol.toFixed(1) + ' ml):</b><br>';
+      for (var j = 0; j < state.glasses.length; j++) {
+        gHtml += '• Ly ' + (j + 1) + ': <b>' + state.glasses[j].liquid.toFixed(1) + ' ml</b><br>';
+      }
+      gHtml += '• Còn sót trong chai: <b>' + leftover.toFixed(1) + ' ml</b> | Đổ tràn: <b>' + state.totalSpilled.toFixed(1) + ' ml</b>';
+      glassesEl.innerHTML = gHtml;
+    } else {
+      // Standard 30-Point Rubric
+      var qualifiedCount = 0;
+      for (var k = 0; k < state.glasses.length; k++) {
+        var g = state.glasses[k];
+        if (Math.abs(g.liquid - g.target) <= 3.6) {
+          qualifiedCount++;
+        }
+      }
+      var passRate = (qualifiedCount / state.numGlasses) * 100;
+
+      var pts1 = 2;
+      if (passRate >= 99) pts1 = 10;
+      else if (passRate >= 70) pts1 = 8;
+      else if (passRate >= 45) pts1 = 6;
+      else if (passRate >= 20) pts1 = 4;
+      else pts1 = 2;
+
+      var sp = Math.round(state.totalSpilled * 10) / 10;
+      var pts2 = 5;
+      if (sp <= 0.2) pts2 = 10;
+      else if (sp <= 0.5) pts2 = 9;
+      else if (sp <= 0.8) pts2 = 8;
+      else if (sp <= 1.1) pts2 = 7;
+      else if (sp <= 1.4) pts2 = 6;
+      else pts2 = 5;
+
+      var base10Sec = (state.mode === 'sparkling') ? 5 : 4;
+      var timePerGlass = state.elapsedTime / state.numGlasses;
+      var tRound = Math.ceil(timePerGlass);
+      var pts3 = 5;
+      if (tRound <= base10Sec) pts3 = 10;
+      else if (tRound === base10Sec + 1) pts3 = 9;
+      else if (tRound === base10Sec + 2) pts3 = 8;
+      else if (tRound === base10Sec + 3) pts3 = 7;
+      else if (tRound === base10Sec + 4) pts3 = 6;
+      else pts3 = 5;
+
+      var totalScore = pts1 + pts2 + pts3;
+      finalScore = totalScore;
+      titleEl.textContent = totalScore >= 25 ? '🏆 DANH TRẤN TỬU PHƯỜNG!' : 'BẢNG ĐIỂM CHUẨN (THANG 30)';
+      scoreEl.textContent = totalScore + ' / 30 ĐIỂM';
+
+      detailsEl.innerHTML =
+        '<table class="score-table">' +
+        '<tr><th>Tiêu chí</th><th>Kết quả</th><th>Điểm</th></tr>' +
+        '<tr><td>1. Ly đạt chuẩn (45ml ±8%)</td><td>' + qualifiedCount + '/' + state.numGlasses + ' (' + Math.round(passRate) + '%)</td><td><b>' + pts1 + ' / 10</b></td></tr>' +
+        '<tr><td>2. Rượu tràn / rơi vãi</td><td>' + sp.toFixed(1) + ' ml</td><td><b>' + pts2 + ' / 10</b></td></tr>' +
+        '<tr><td>3. Thời gian / ly (≤' + base10Sec + 's=10đ)</td><td>' + timePerGlass.toFixed(1) + 's / ly</td><td><b>' + pts3 + ' / 10</b></td></tr>' +
+        '</table>';
+
+      var listHtml = '<b>Định lượng từng ly (Mục tiêu 45.0 ml' + (state.handTremor ? ' • Có Run Tay' : '') + '):</b><br>';
+      for (var m = 0; m < state.glasses.length; m++) {
+        var gl = state.glasses[m];
+        var ok = Math.abs(gl.liquid - gl.target) <= 3.6;
+        listHtml += '• Ly ' + (m + 1) + ': <b>' + gl.liquid.toFixed(1) + ' ml</b> ' + (ok ? '✅ Đạt' : '❌ Lệch') + '<br>';
+      }
+      glassesEl.innerHTML = listHtml;
+    }
+
+    // Trigger Applause & Confetti when scoring >= 25 / 30
+    if (finalScore >= 25) {
+      resultCard.classList.add('celebrate');
+      applauseBadge.style.display = 'block';
+      sfx.playApplauseAndFanfare();
+      spawnConfetti();
+    } else {
+      resultCard.classList.remove('celebrate');
+      applauseBadge.style.display = 'none';
+      cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    }
+
+    modal.style.display = 'flex';
+  }
+
+  function getHeightFraction(vol, maxCap, isTapered) {
+    var vFrac = Math.max(0, Math.min(1, vol / maxCap));
+    if (!isTapered) return vFrac;
+    return Math.pow(vFrac, 0.56);
+  }
+
+  // =========================================================================
+  // UPGRADED VISUAL SCENE RENDERER
+  // =========================================================================
+  function drawScene() {
+    var rect = wrap.getBoundingClientRect();
+    var w = rect.width;
+    var h = rect.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // 0. Cozy Tavern Background & Warm Lantern Glow
+    var bgGrad = ctx.createRadialGradient(w * 0.42, h * 0.18, 10, w * 0.45, h * 0.45, Math.max(w, h) * 0.9);
+    bgGrad.addColorStop(0, '#3a2112');
+    bgGrad.addColorStop(0.45, '#1f120a');
+    bgGrad.addColorStop(1, '#0f0804');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Subtle Distant Tavern Shelves & Bottle Silhouettes
+    var shelfY1 = h * 0.25;
+    var shelfY2 = h * 0.48;
+    ctx.fillStyle = 'rgba(12, 6, 3, 0.55)';
+    ctx.fillRect(0, shelfY1, w, 5);
+    ctx.fillRect(0, shelfY2, w, 5);
+
+    // Ambient Bokeh Lights
+    for (var b = 0; b < state.bokehLights.length; b++) {
+      var bk = state.bokehLights[b];
+      var pulse = 0.8 + 0.2 * Math.sin(state.wavePhase * 0.25 + bk.phase);
+      ctx.beginPath();
+      ctx.arc(bk.xFrac * w, bk.yFrac * h, bk.r * pulse, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + bk.color + ',' + (bk.alpha * pulse) + ')';
+      ctx.fill();
+    }
+
+    // 1. Draw Touch Guide Zones (1/4 edge to 1/2 center)
+    var startX = state.rightHanded ? 0.75 * w : 0.25 * w;
+    var maxX = 0.50 * w;
+
+    ctx.save();
+    var gradZone = ctx.createLinearGradient(startX, 0, maxX, 0);
+    gradZone.addColorStop(0, 'rgba(200, 125, 40, 0.04)');
+    gradZone.addColorStop(1, 'rgba(200, 125, 40, 0.14)');
+    ctx.fillStyle = gradZone;
+    var bandLeft = Math.min(startX, maxX);
+    var bandWidth = Math.abs(maxX - startX);
+    ctx.fillRect(bandLeft, 0, bandWidth, h);
+
+    ctx.setLineDash([5, 5]);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(246, 182, 86, 0.32)';
+    ctx.beginPath();
+    ctx.moveTo(startX, 0); ctx.lineTo(startX, h);
+    ctx.moveTo(maxX, 0); ctx.lineTo(maxX, h);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = 'rgba(245, 235, 214, 0.48)';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('1/4 (Bắt đầu chảy)', startX, h - 8);
+    ctx.fillText('1/2 (Chảy mạnh nhất)', maxX, h - 8);
+    ctx.restore();
+
+    // 2. Rich Oak Wood Table Surface with Wood Grain & Bevel
+    var tableY = h * 0.79;
+    var tableGrad = ctx.createLinearGradient(0, tableY, 0, h);
+    tableGrad.addColorStop(0, '#5a361c');
+    tableGrad.addColorStop(0.06, '#422713');
+    tableGrad.addColorStop(0.3, '#2d190b');
+    tableGrad.addColorStop(1, '#120904');
+    ctx.fillStyle = tableGrad;
+    ctx.fillRect(0, tableY, w, h - tableY);
+
+    // Subtle wood grain lines
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 195, 130, 0.05)';
+    ctx.lineWidth = 1;
+    for (var wg = 1; wg <= 5; wg++) {
+      var wy = tableY + (h - tableY) * (wg / 6);
+      ctx.beginPath();
+      ctx.moveTo(0, wy);
+      ctx.bezierCurveTo(w * 0.3, wy + 3, w * 0.7, wy - 3, w, wy);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Specular table rim highlight
+    var rimGrad = ctx.createLinearGradient(0, tableY, w, tableY);
+    rimGrad.addColorStop(0, '#4a2f1b');
+    rimGrad.addColorStop(0.4, '#9c6839');
+    rimGrad.addColorStop(0.8, '#4a2f1b');
+    ctx.strokeStyle = rimGrad;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(0, tableY);
+    ctx.lineTo(w, tableY);
+    ctx.stroke();
+
+    // Determine liquid color scheme
+    var liqPalette = {
+      top: 'rgba(240, 250, 255, 0.88)',
+      bot: 'rgba(185, 220, 240, 0.75)',
+      meniscus: 'rgba(255, 255, 255, 0.92)',
+      stream: 'rgba(235, 248, 255, 0.90)'
+    };
+    if (state.mode === 'sparkling') {
+      liqPalette = {
+        top: 'rgba(225, 38, 68, 0.92)',
+        bot: 'rgba(120, 10, 28, 0.95)',
+        meniscus: 'rgba(255, 150, 170, 0.92)',
+        stream: 'rgba(235, 65, 95, 0.92)'
+      };
+    } else if (state.mode === 'blind') {
+      liqPalette = {
+        top: 'rgba(248, 200, 95, 0.90)',
+        bot: 'rgba(185, 115, 25, 0.92)',
+        meniscus: 'rgba(255, 232, 165, 0.95)',
+        stream: 'rgba(248, 210, 120, 0.92)'
+      };
+    }
+
+    // 3. Draw Glasses on Table
+    var isBlind = (state.mode === 'blind');
+    var isTapered = (state.mode === 'tapered');
+
+    var glassH = isBlind ? Math.min(68, h * 0.14) : Math.min(115, h * 0.24);
+    var rBot = isTapered ? 12 : (isBlind ? 17 : 26);
+    var rTop = isTapered ? 36 : (isBlind ? 20 : 30);
+    var glassSpacing = isBlind ? 68 : 90;
+
+    var activeCenterX = w * 0.40;
+
+    for (var i = 0; i < state.glasses.length; i++) {
+      var relIdx = i - state.currentGlass - (state.switchingGlass ? state.trayOffsetX : 0);
+      var gx = activeCenterX - relIdx * glassSpacing;
+      var gy = tableY;
+
+      if (gx < -80 || gx > w + 80) continue;
+
+      drawSingleGlass(gx, gy, rBot, rTop, glassH, state.glasses[i], i === state.currentGlass, i, liqPalette, isBlind, isTapered);
+    }
+
+    // 4. Draw Pouring Bottle & Falling Liquid Stream
+    var spoutX = activeCenterX + state.tremorOffsetX;
+    var spoutY = tableY - glassH - (isBlind ? 82 : 92);
+
+    var curG = state.glasses[state.currentGlass];
+    var curLiqFrac = curG ? getHeightFraction(curG.liquid, curG.maxCap, isTapered) : 0;
+    var streamLandY = tableY - glassH * curLiqFrac;
+
+    drawBottleAndStream(spoutX, spoutY, tableY, streamLandY, glassH, liqPalette, isBlind);
+
+    // 5. In Game 4 ("Chia rượu" / Blind mode), draw 1:1 Upright Bottle with 100ml, 200ml graduations
+    if (isBlind) {
+      drawTrueScaleReference(w, h, liqPalette);
+    }
+
+    // 6. Floating status text
+    if (state.floatingText) {
+      ctx.save();
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillStyle = state.floatingText.color;
+      ctx.shadowColor = 'rgba(0,0,0,0.85)';
+      ctx.shadowBlur = 6;
+      ctx.textAlign = 'center';
+      ctx.fillText(state.floatingText.text, activeCenterX, tableY - glassH - 30);
+      ctx.restore();
+    }
+
+    // 7. Finger Touch Indicator
+    if (state.isTouching) {
+      var rectCanvas = canvas.getBoundingClientRect();
+      var fx = state.fingerX - rectCanvas.left;
+      var fy = state.fingerY - rectCanvas.top;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(fx, fy, 22, 0, Math.PI * 2);
+      ctx.fillStyle = state.handTremor ? 'rgba(255, 107, 107, 0.25)' : 'rgba(246, 182, 86, 0.25)';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = state.handTremor ? '#ff6b6b' : '#f6b656';
+      ctx.stroke();
+
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(Math.round(state.pourRatio * 100) + '%', fx, fy - 28);
+      ctx.restore();
+    }
+  }
+
+  function drawSingleGlass(gx, gy, rBot, rTop, glassH, gData, isActive, idx, liqPalette, isBlind, isTapered) {
+    ctx.save();
+    ctx.globalAlpha = isActive ? 1.0 : 0.76;
+
+    // 1. Table Contact Shadow & Spilled Puddle
+    ctx.beginPath();
+    ctx.ellipse(gx, gy + 2, rBot * 1.25, 5.5, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+    ctx.fill();
+
+    if (gData.spilled > 0.05) {
+      var puddleR = Math.min(rBot * 1.9, rBot * 1.1 + gData.spilled * 2.5);
+      ctx.beginPath();
+      ctx.ellipse(gx + 3, gy + 3, puddleR, 4.5, 0, 0, Math.PI * 2);
+      ctx.fillStyle = liqPalette.top;
+      ctx.fill();
+    }
+
+    // 2. Back Glass Wall Shading
+    var glassBgGrad = ctx.createLinearGradient(gx - rTop, gy - glassH, gx + rTop, gy);
+    glassBgGrad.addColorStop(0, 'rgba(255, 255, 255, 0.10)');
+    glassBgGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.03)');
+    glassBgGrad.addColorStop(1, 'rgba(255, 255, 255, 0.12)');
+    ctx.beginPath();
+    ctx.moveTo(gx - rTop, gy - glassH);
+    ctx.lineTo(gx - rBot, gy);
+    ctx.lineTo(gx + rBot, gy);
+    ctx.lineTo(gx + rTop, gy - glassH);
+    ctx.closePath();
+    ctx.fillStyle = glassBgGrad;
+    ctx.fill();
+
+    var liqHFrac = getHeightFraction(gData.liquid, gData.maxCap, isTapered);
+    var totalHFrac = getHeightFraction(gData.liquid + gData.foam, gData.maxCap, isTapered);
+
+    var liqH = glassH * liqHFrac;
+    var totalH = glassH * totalHFrac;
+
+    // 3. Liquid Body with 3D Gradient & Animated Surface Wave
+    if (liqH > 0.5) {
+      var rAtLiq = rBot + (rTop - rBot) * liqHFrac;
+      var waveAmp = gData.ripple * 2.5;
+      var wOffset = Math.sin(state.wavePhase) * waveAmp;
+
+      var lGrad = ctx.createLinearGradient(gx, gy - liqH, gx, gy);
+      lGrad.addColorStop(0, liqPalette.top);
+      lGrad.addColorStop(1, liqPalette.bot);
+
+      ctx.beginPath();
+      ctx.moveTo(gx - rBot + 2, gy - 3);
+      ctx.lineTo(gx + rBot - 2, gy - 3);
+      ctx.lineTo(gx + rAtLiq - 2, gy - liqH - wOffset);
+      ctx.quadraticCurveTo(gx, gy - liqH + wOffset * 1.4, gx - rAtLiq + 2, gy - liqH + wOffset);
+      ctx.closePath();
+      ctx.fillStyle = lGrad;
+      ctx.fill();
+
+      // 3D Liquid Meniscus Ellipse
+      ctx.beginPath();
+      ctx.ellipse(gx, gy - liqH, Math.max(2, rAtLiq - 2), 3.2, 0, 0, Math.PI * 2);
+      ctx.fillStyle = liqPalette.meniscus;
+      ctx.fill();
+    }
+
+    // 4. Foam Layer for Sparkling Wine
+    if (state.mode === 'sparkling' && gData.foam > 0.2) {
+      var rAtLiqTop = rBot + (rTop - rBot) * liqHFrac;
+      var rAtFoamTop = rBot + (rTop - rBot) * totalHFrac;
+      var foamGrad = ctx.createLinearGradient(gx, gy - totalH, gx, gy - liqH);
+      foamGrad.addColorStop(0, 'rgba(255, 248, 250, 0.96)');
+      foamGrad.addColorStop(1, 'rgba(245, 205, 215, 0.88)');
+
+      ctx.beginPath();
+      ctx.moveTo(gx - rAtLiqTop + 2, gy - liqH);
+      ctx.lineTo(gx + rAtLiqTop - 2, gy - liqH);
+      ctx.lineTo(gx + rAtFoamTop - 2, gy - totalH);
+      ctx.lineTo(gx - rAtFoamTop + 2, gy - totalH);
+      ctx.closePath();
+      ctx.fillStyle = foamGrad;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(gx, gy - totalH, Math.max(2, rAtFoamTop - 2), 3.2, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 252, 252, 0.98)';
+      ctx.fill();
+    }
+
+    // 5. Rising Bubbles in Active Sparkling Glass
+    if (state.mode === 'sparkling' && isActive && liqH > 5) {
+      ctx.fillStyle = 'rgba(255, 240, 245, 0.72)';
+      for (var b = 0; b < state.bubbles.length; b++) {
+        var bub = state.bubbles[b];
+        var bx = gx + bub.rx * rBot;
+        var by = gy - 5 - bub.yFrac * (liqH - 6);
+        ctx.beginPath();
+        ctx.arc(bx, by, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // 6. Thick Crystal Glass Base Refraction
+    var baseGrad = ctx.createLinearGradient(gx - rBot, gy - 6, gx + rBot, gy);
+    baseGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+    baseGrad.addColorStop(0.5, 'rgba(200, 230, 255, 0.20)');
+    baseGrad.addColorStop(1, 'rgba(255, 255, 255, 0.50)');
+    ctx.fillStyle = baseGrad;
+    ctx.beginPath();
+    ctx.roundRect(gx - rBot, gy - 5, rBot * 2, 5, 2);
+    ctx.fill();
+
+    // 7. Vertical Specular Glass Reflection Streaks
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.38)';
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(gx - rTop * 0.68, gy - glassH + 8);
+    ctx.lineTo(gx - rBot * 0.68, gy - 8);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(gx + rTop * 0.72, gy - glassH + 10);
+    ctx.lineTo(gx + rBot * 0.72, gy - 8);
+    ctx.stroke();
+
+    // 8. Glass Walls & 3D Elliptical Rim
+    ctx.beginPath();
+    ctx.moveTo(gx - rTop, gy - glassH);
+    ctx.lineTo(gx - rBot, gy);
+    ctx.lineTo(gx + rBot, gy);
+    ctx.lineTo(gx + rTop, gy - glassH);
+    ctx.lineWidth = isActive ? 2.4 : 1.7;
+    ctx.strokeStyle = isActive ? 'rgba(255, 255, 255, 0.92)' : 'rgba(210, 210, 210, 0.5)';
+    ctx.stroke();
+
+    // 3D Top Rim
+    ctx.beginPath();
+    ctx.ellipse(gx, gy - glassH, rTop, 3.8, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = isActive ? 'rgba(255, 255, 255, 0.85)' : 'rgba(210, 210, 210, 0.45)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // 9. Target Line (45ml) for non-blind modes
+    if (!isBlind) {
+      var targetFrac = getHeightFraction(gData.target, gData.maxCap, isTapered);
+      var targetY = gy - glassH * targetFrac;
+      var rAtTarget = rBot + (rTop - rBot) * targetFrac;
+
+      ctx.strokeStyle = '#5ce68b';
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(gx - rAtTarget - 4, targetY);
+      ctx.lineTo(gx + rAtTarget + 4, targetY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      if (isActive) {
+        ctx.fillStyle = '#5ce68b';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('45ml', gx + rAtTarget + 6, targetY + 3);
+      }
+    } else {
+      var f23 = 0.67, f34 = 0.75;
+      ctx.strokeStyle = 'rgba(246, 182, 86, 0.45)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(gx - rBot - 2, gy - glassH * f23);
+      ctx.lineTo(gx + rBot + 2, gy - glassH * f23);
+      ctx.moveTo(gx - rBot - 2, gy - glassH * f34);
+      ctx.lineTo(gx + rBot + 2, gy - glassH * f34);
+      ctx.stroke();
+    }
+
+    // 10. Label below glass
+    ctx.fillStyle = isActive ? '#ffdfa8' : '#ccb597';
+    ctx.font = isActive ? 'bold 11px sans-serif' : '11px sans-serif';
+    ctx.textAlign = 'center';
+    if (isBlind) {
+      ctx.fillText('Ly ' + (idx + 1), gx, gy + 17);
+    } else {
+      ctx.fillText('Ly ' + (idx + 1) + ': ' + gData.liquid.toFixed(1) + 'ml', gx, gy + 17);
+    }
+
+    ctx.restore();
+  }
+
+  function drawBottleAndStream(spoutX, spoutY, tableY, streamLandY, glassH, liqPalette, isBlind) {
+    // 1. Natural Tapered Liquid Stream + Splash Droplets
+    if (state.Q_actual > 0.1 || state.inFlightVol > 0.04) {
+      var topW = Math.max(1.8, Math.min(7.5, (state.Q_actual / 24) * 7.0));
+      if (state.glugIntensity > 0.1) {
+        topW *= (1 + 0.38 * Math.sin(state.glugPhase));
+      }
+      var botW = Math.max(1.0, topW * 0.58);
+      var landX = spoutX - state.tremorOffsetX * 0.25;
+      var targetY = Math.min(tableY - 4, streamLandY);
+
+      ctx.save();
+      var streamGrad = ctx.createLinearGradient(spoutX, spoutY, landX, targetY);
+      streamGrad.addColorStop(0, liqPalette.stream);
+      streamGrad.addColorStop(0.5, liqPalette.meniscus);
+      streamGrad.addColorStop(1, liqPalette.top);
+
+      ctx.beginPath();
+      ctx.moveTo(spoutX - topW / 2, spoutY);
+      ctx.lineTo(spoutX + topW / 2, spoutY);
+      ctx.lineTo(landX + botW / 2, targetY);
+      ctx.lineTo(landX - botW / 2, targetY);
+      ctx.closePath();
+      ctx.fillStyle = streamGrad;
+      ctx.fill();
+
+      // Specular core highlight on stream
+      ctx.beginPath();
+      ctx.moveTo(spoutX, spoutY);
+      ctx.lineTo(landX, targetY);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.lineWidth = Math.max(0.8, topW * 0.28);
+      ctx.stroke();
+      ctx.restore();
+
+      // Spawn splash particles at landing point
+      if (Math.random() < 0.65 && state.splashes.length < 18) {
+        state.splashes.push({
+          x: landX + (Math.random() - 0.5) * 6,
+          y: targetY,
+          vx: (Math.random() - 0.5) * 55,
+          vy: -25 - Math.random() * 45,
+          r: 1.2 + Math.random() * 1.5,
+          life: 0.14 + Math.random() * 0.12
+        });
+      }
+    }
+
+    // Draw Splash Droplets
+    if (state.splashes.length > 0) {
+      ctx.save();
+      ctx.fillStyle = liqPalette.meniscus;
+      for (var s = 0; s < state.splashes.length; s++) {
+        var sp = state.splashes[s];
+        ctx.beginPath();
+        ctx.arc(sp.x, sp.y, sp.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // 2. 3D Bottle Geometry (Rotated around spout tip at (spoutX, spoutY))
+    ctx.save();
+    ctx.translate(spoutX, spoutY);
+    var dir = state.rightHanded ? 1 : -1;
+    var angleDeg = 32 + (state.tiltAngle / 1.65) * 82;
+    var rad = (angleDeg * Math.PI / 180) * dir;
+    ctx.rotate(-rad);
+
+    var neckLen = 34;
+    var neckR = 8.5;
+    var bodyLen = isBlind ? 118 : 110;
+    var bodyR = isBlind ? 32 : 28;
+    var totalLen = neckLen + bodyLen;
+
+    // Bottle Path Definition
+    ctx.beginPath();
+    ctx.moveTo(-neckR, 0);
+    ctx.lineTo(neckR, 0);
+    ctx.lineTo(neckR, neckLen * 0.7);
+    ctx.quadraticCurveTo(bodyR, neckLen, bodyR, neckLen + 14);
+    ctx.lineTo(bodyR, totalLen - 8);
+    ctx.quadraticCurveTo(bodyR, totalLen, bodyR - 8, totalLen);
+    ctx.lineTo(-bodyR + 8, totalLen);
+    ctx.quadraticCurveTo(-bodyR, totalLen, -bodyR, totalLen - 8);
+    ctx.lineTo(-bodyR, neckLen + 14);
+    ctx.quadraticCurveTo(-bodyR, neckLen, -neckR, neckLen * 0.7);
+    ctx.closePath();
+
+    // Tinted Glass Background
+    var bottleTint = ctx.createLinearGradient(-bodyR, 0, bodyR, 0);
+    if (state.mode === 'sparkling') {
+      bottleTint.addColorStop(0, 'rgba(25, 65, 38, 0.65)');
+      bottleTint.addColorStop(0.5, 'rgba(40, 95, 55, 0.35)');
+      bottleTint.addColorStop(1, 'rgba(18, 48, 28, 0.70)');
+    } else {
+      bottleTint.addColorStop(0, 'rgba(180, 215, 235, 0.22)');
+      bottleTint.addColorStop(0.5, 'rgba(240, 250, 255, 0.08)');
+      bottleTint.addColorStop(1, 'rgba(160, 200, 220, 0.28)');
+    }
+    ctx.fillStyle = bottleTint;
+    ctx.fill();
+
+    // Clip to Bottle Interior for Liquid & Glug Bubbles
+    ctx.save();
+    ctx.clip();
+
+    var fillFrac = Math.max(0, Math.min(1, state.bottleVol / state.bottleMaxVol));
+    if (fillFrac > 0.005) {
+      ctx.save();
+      var pivotY = neckLen + bodyLen * (1 - fillFrac * 0.65);
+      ctx.translate(0, pivotY);
+      ctx.rotate(rad);
+
+      var bLiqGrad = ctx.createLinearGradient(0, 0, 0, 140);
+      bLiqGrad.addColorStop(0, liqPalette.top);
+      bLiqGrad.addColorStop(1, liqPalette.bot);
+      ctx.fillStyle = bLiqGrad;
+      ctx.fillRect(-200, 0, 400, 300);
+
+      // Liquid surface line inside bottle
+      ctx.strokeStyle = liqPalette.meniscus;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-180, 0);
+      ctx.lineTo(180, 0);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Draw Glugging Air Bubbles rising from neck into bottle
+    if (state.neckBubbles.length > 0) {
+      for (var nb = 0; nb < state.neckBubbles.length; nb++) {
+        var bObj = state.neckBubbles[nb];
+        ctx.beginPath();
+        ctx.arc(bObj.x, bObj.y, bObj.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255,' + bObj.alpha.toFixed(2) + ')';
+        ctx.fill();
+      }
+    }
+
+    // Decorative Vintage Label on Bottle Body (subtle so graduations stay clear)
+    var labelY = neckLen + bodyLen * 0.42;
+    ctx.fillStyle = 'rgba(40, 24, 12, 0.52)';
+    ctx.strokeStyle = 'rgba(246, 182, 86, 0.55)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(-bodyR + 5, labelY, (bodyR - 5) * 2, 22, 3);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255, 223, 168, 0.78)';
+    ctx.font = 'bold 8px sans-serif';
+    ctx.textAlign = 'center';
+    var brandName = state.mode === 'sparkling' ? 'VANG SỦI' : (state.mode === 'blind' ? 'TỬU VƯƠNG' : 'RƯỢU ĐẾ');
+    ctx.fillText(brandName, 0, labelY + 14);
+
+    // 3D Cylindrical Glass Highlight on Bottle
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.42)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(-bodyR * 0.62, neckLen + 14);
+    ctx.lineTo(-bodyR * 0.62, totalLen - 10);
+    ctx.stroke();
+
+    ctx.restore(); // End Bottle Clip
+
+    // Bottle Outer Contour & Lip Ring
+    ctx.strokeStyle = 'rgba(230, 242, 250, 0.88)';
+    ctx.lineWidth = 2.2;
+    ctx.stroke();
+
+    // Bottle Spout Lip Ring
+    ctx.fillStyle = '#d49b4b';
+    ctx.beginPath();
+    ctx.roundRect(-neckR - 1.5, 0, (neckR + 1.5) * 2, 4, 2);
+    ctx.fill();
+
+    // Volume Graduation Marks (100ml & 200ml)
+    var y100 = totalLen - (bodyLen * (100 / 300));
+    var y200 = totalLen - (bodyLen * (200 / 300));
+
+    ctx.strokeStyle = isBlind ? 'rgba(246, 182, 86, 0.92)' : 'rgba(255, 255, 255, 0.55)';
+    ctx.lineWidth = isBlind ? 1.6 : 1.1;
+
+    ctx.beginPath();
+    ctx.moveTo(-bodyR + 4, y100);
+    ctx.lineTo(bodyR - 4, y100);
+    ctx.moveTo(-bodyR + 4, y200);
+    ctx.lineTo(bodyR - 4, y200);
+    ctx.stroke();
+
+    ctx.fillStyle = isBlind ? '#ffdfa8' : 'rgba(255,255,255,0.78)';
+    ctx.font = 'bold 9px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('100ml', 0, y100 - 3);
+    ctx.fillText('200ml', 0, y200 - 3);
+
+    ctx.restore();
+  }
+
+  function drawTrueScaleReference(w, h, liqPalette) {
+    var boxW = 132;
+    var boxH = 154;
+    var bx = w - boxW - 8;
+    var by = 8;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(20, 13, 8, 0.92)';
+    ctx.strokeStyle = '#c87d28';
+    ctx.lineWidth = 1.5;
+    ctx.roundRect(bx, by, boxW, boxH, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#f6b656';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ƯỚC LƯỢNG CHAI & LY', bx + boxW / 2, by + 14);
+
+    var baseLineY = by + boxH - 18;
+
+    // 1. Upright Bottle (Left) - 300ml full body height
+    var bCenterX = bx + 48;
+    var bR = 21;
+    var bBodyH = 90;
+    var bNeckH = 18;
+    var bNeckR = 6;
+
+    var fillFrac = Math.max(0, Math.min(1, state.bottleVol / state.bottleMaxVol));
+    var liqH = bBodyH * fillFrac;
+
+    if (liqH > 0.5) {
+      ctx.fillStyle = liqPalette.top;
+      ctx.fillRect(bCenterX - bR + 1.5, baseLineY - liqH, (bR - 1.5) * 2, liqH);
+    }
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.88)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(bCenterX - bNeckR, baseLineY - bBodyH - bNeckH);
+    ctx.lineTo(bCenterX + bNeckR, baseLineY - bBodyH - bNeckH);
+    ctx.lineTo(bCenterX + bNeckR, baseLineY - bBodyH - 4);
+    ctx.lineTo(bCenterX + bR, baseLineY - bBodyH + 6);
+    ctx.lineTo(bCenterX + bR, baseLineY);
+    ctx.lineTo(bCenterX - bR, baseLineY);
+    ctx.lineTo(bCenterX - bR, baseLineY - bBodyH + 6);
+    ctx.lineTo(bCenterX - bNeckR, baseLineY - bBodyH - 4);
+    ctx.closePath();
+    ctx.stroke();
+
+    var y100 = baseLineY - bBodyH * (100 / 300);
+    var y200 = baseLineY - bBodyH * (200 / 300);
+
+    ctx.strokeStyle = '#f6b656';
+    ctx.lineWidth = 1.3;
+    ctx.setLineDash([3, 2]);
+    ctx.beginPath();
+    ctx.moveTo(bCenterX - bR, y100);
+    ctx.lineTo(bCenterX + bR, y100);
+    ctx.moveTo(bCenterX - bR, y200);
+    ctx.lineTo(bCenterX + bR, y200);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#ffdfa8';
+    ctx.font = 'bold 9px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('100', bCenterX - bR - 2, y100 + 3);
+    ctx.fillText('200', bCenterX - bR - 2, y200 + 3);
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.font = '8px sans-serif';
+    ctx.fillText('100ml', bCenterX, y100 - 2);
+    ctx.fillText('200ml', bCenterX, y200 - 2);
+
+    // 2. Sample Glass (Right) at 1:1 scale alongside bottle (55ml)
+    var gCenterX = bx + 102;
+    var gRBot = 10;
+    var gRTop = 11.5;
+    var gH = 38;
+
+    var curG = state.glasses[state.currentGlass];
+    var gFrac = curG ? Math.min(1, curG.liquid / curG.maxCap) : 0;
+    if (gFrac > 0.01) {
+      var ghLiq = gH * gFrac;
+      ctx.fillStyle = liqPalette.top;
+      ctx.fillRect(gCenterX - gRBot + 1, baseLineY - ghLiq, (gRBot - 1) * 2, ghLiq);
+    }
+
+    ctx.fillStyle = 'rgba(92, 230, 139, 0.28)';
+    ctx.fillRect(gCenterX - gRTop, baseLineY - gH * 0.75, gRTop * 2, gH * (0.75 - 0.66));
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(gCenterX - gRTop, baseLineY - gH);
+    ctx.lineTo(gCenterX - gRBot, baseLineY);
+    ctx.lineTo(gCenterX + gRBot, baseLineY);
+    ctx.lineTo(gCenterX + gRTop, baseLineY - gH);
+    ctx.stroke();
+
+    ctx.fillStyle = '#e2cfb6';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Chai 300ml', bCenterX, baseLineY + 11);
+    ctx.fillText('Ly 55ml', gCenterX, baseLineY + 11);
+
+    ctx.restore();
+  }
+
+  // Main Animation Loop
+  var lastTime = performance.now();
+  function loop(now) {
+    var dt = Math.min(0.05, (now - lastTime) / 1000);
+    lastTime = now;
+    updatePhysics(dt);
+    drawScene();
+    requestAnimationFrame(loop);
+  }
+
+  initGame();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
